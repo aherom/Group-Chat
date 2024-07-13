@@ -6,13 +6,17 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="/user/sigin" method="POST">
-        name:<input type="text" id="name"><br>
-        Email:<input type="email" id="email"><br>
-        Phone:<input type="tel" id="Phone"><br>
-        Password:<input type="password" id="password">
+    <form id="siginform">
+        name:<input type="text" name="name" id="name"><br>
+        Email:<input type="email" name="email" id="email"><br>
+        Phone:<input type="tel" name="phone" id="Phone"><br>
+        Password:<input type="password" name="password" id="password">
 
         <button type="submit">submit</button>
     </form>
+    <div id="errorMessage"></div> 
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="ftsigin.js"></script>
 </body>
 </html>
