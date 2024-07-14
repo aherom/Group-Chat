@@ -13,13 +13,19 @@ app.use(bodyparser.urlencoded({extended:false}));
 app.use(bodyparser.json());
 
 app.use(express.static(path.join(__dirname,"public")));
+app.use(express.static(path.join(__dirname,"view")));
+
+
+app.use('/user/login',(req,res)=>
+{
+       console.log(req.body);
+})
+app.use('/user',singin);
 
 app.get('/',(req,res)=>{
    
-    res.sendFile(path.join(__dirname, "view", "singin.html"));
+    res.sendFile(path.join(__dirname, "view", "login.html"));
 })
-
-app.use('/user',singin);
 
 dbconfig.sync();
 app.listen(3000);
