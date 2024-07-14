@@ -6,8 +6,9 @@ async function login(event)
     const password = event.target.password.value;
 
     try{
-        
         const response = await axios.post('/user/login',{emailorphone,password});
+        console.log(response.data);
+        localStorage.setItem('token',response.data.token);
         alert('account created successful');
         window.location.href = 'chat.html'
      }

@@ -1,5 +1,8 @@
 const bcrypt = require('bcrypt');
 const user = require('../module/user');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = 'your_secret_key';
 
 exports.login = async (req, res) => {
     try {
@@ -19,8 +22,12 @@ exports.login = async (req, res) => {
         if (!isPasswordMatch) {
             return res.status(401).send('Invalid password');
         }
+         
+        const token = jwt.sign({ 
+            userid: userRecord.id
+          }, JWT_SECRET);
 
-        res.status(200).send('Login successful');
+          res.status(200).json({ message: 'Login successful', token: token });
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).send('Internal server error');
