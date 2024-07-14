@@ -9,6 +9,7 @@ async function login(event)
         
         const response = await axios.post('/user/login',{emailorphone,password});
         alert('account created successful');
+        window.location.href = 'chat.html'
      }
   catch(error){
       document.getElementById('errorMessage').innerHTML=error.response ?
