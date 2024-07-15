@@ -63,10 +63,18 @@ async function accessGroup(groupId) {
         } else {
             const joinRequest = confirm('You are not a member. Do you want to send a request to join this group?');
             if (joinRequest) {
-                await axios.post('/add/user', { groupId }, {
-                    headers: { 'Authorization': token }
-                });
-                alert('Request sent');
+                try {
+                    await axios.post('/add/user', { groupId }, {
+                        headers: { 'Authorization': token }
+                    });
+                    alert('Request sent');
+                } catch (error) {
+                    if (error.response && error.response.status === 400) {
+                        alert('Request already exists');
+                    } else {
+                        alert('Failed to send request');
+                    }
+                }
             }
         }
     } catch (error) {
@@ -74,6 +82,5 @@ async function accessGroup(groupId) {
         alert('Failed to access group');
     }
 }
-
 
 fetchGroups();

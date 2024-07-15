@@ -14,6 +14,8 @@ const routgroup = require('./router/routgroup');
 const access = require('./router/access');
 const addmessage = require('./router/addmessage');
 const displaymessage = require('./router/displaymessage');
+const routadmin = require('./router/routadmin');
+const joinrequest = require('./router/joinrequest');
 
 const app = express();
 
@@ -53,7 +55,11 @@ app.use('/group',access);
 app.use('/group', addmessage );
 
 app.use('/find', displaymessage);
+          
+app.use('/isAdmin',routadmin);
 
+
+app.use('/add',joinrequest)
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "view", "login.html"));

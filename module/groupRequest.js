@@ -15,18 +15,6 @@ const GroupRequest = sequelize.define('groupRequest', {
             model: User,
             key: 'id'
         }
-    },
-    groupId: {
-        type: Sequelize.INTEGER,
-        references: {
-            model: Group,
-            key: 'groupId'
-        }
-    },
-    status: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: 'pending' // can be 'pending', 'approved', or 'rejected'
     }
 });
 
