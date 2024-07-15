@@ -11,6 +11,9 @@ const GroupRequest = require('./module/groupRequest');
 
 const singin = require('./router/singin');
 const routgroup = require('./router/routgroup');
+const access = require('./router/access');
+const addmessage = require('./router/addmessage');
+const displaymessage = require('./router/displaymessage');
 
 const app = express();
 
@@ -44,6 +47,13 @@ app.use('/user', singin);
 app.use('/create',routgroup);
 
 app.use('/group',routgroup);
+
+app.use('/group',access);
+
+app.use('/group', addmessage );
+
+app.use('/find', displaymessage);
+
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "view", "login.html"));

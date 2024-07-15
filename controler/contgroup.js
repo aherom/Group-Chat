@@ -9,10 +9,10 @@ exports.newgroup = async (req, res) => {
         
         const newGroup = await Group.create({ name });
 
-        
+       
         await UserGroup.create({
-            UserId: userid,
-            GroupId: newGroup.id,
+            userId: userid,
+            groupGroupId:newGroup.groupId,
             isAdmin: true
         });
 
