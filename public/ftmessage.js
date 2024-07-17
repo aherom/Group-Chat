@@ -71,13 +71,13 @@ async function checkAdminStatus() {
             const userDetailsBtn = document.createElement('button');
             userDetailsBtn.textContent = 'User Details';
             userDetailsBtn.addEventListener('click', () => {
-                // Add functionality to show user details
+                members()
             });
 
             const manageRequestsBtn = document.createElement('button');
             manageRequestsBtn.textContent = 'Manage Requests';
             manageRequestsBtn.addEventListener('click', () => {
-                // Add functionality to manage requests
+               
                 manageRequests(groupId);
             });
 
@@ -91,6 +91,61 @@ async function checkAdminStatus() {
 }
 
 checkAdminStatus();
+async function members()
+{
+    const token = localStorage.getItem('token');
+        const response = await axios.get(`/see/members/${groupId}`, {
+            headers: { 'Authorization': token }
+        });  
+
+        console.log(response.data);
+        
+        const requestList = document.createElement('ul');
+        requestList.id = 'requestList';
+ response.data.forEach(userr=>{
+    const requestItem = document.createElement('li');
+        requestItem.innerHTML = 
+        `<strong>${userr.userName}</strong>
+<button onclick="Makeadmin(${userr.userId}, ${groupId})">Makeadmin</button>
+<button onclick="Remove(${userr.userId}, ${groupId})">Remove</button>
+`;
+        requestList.appendChild(requestItem);
+        })
+
+const adminActions = document.getElementById('adminActions');
+adminActions.innerHTML = ''; 
+adminActions.appendChild(requestList);
+}
+
+async function Makeadmin(userId, groupId) {
+    try {
+        const token = localStorage.getItem('token');
+        await axios.post('/see/admin', { userId, groupId }, {
+            headers: { 'Authorization': token }
+        });
+        alert('Request accepted');
+        manageRequests(groupId); // Refresh the list
+    } catch (error) {
+        console.error('Error accepting request:', error);
+        alert('Failed to accept request');
+    }
+}
+
+async function Remove(userId, groupId) {
+    try {
+        const token = localStorage.getItem('token');
+        await axios.post('/see/remove', { userId, groupId }, {
+            headers: { 'Authorization': token }
+        });
+        alert('Request accepted');
+        manageRequests(groupId); // Refresh the list
+    } catch (error) {
+        console.error('Error accepting request:', error);
+        alert('Failed to accept request');
+    }
+}
+
+
 
 async function manageRequests(groupId) {
     try {

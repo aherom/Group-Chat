@@ -27,7 +27,7 @@ router.use('/requests/:groupId', authenticateToken, async (req, res) => {
 router.use('/accept', authenticateToken, async (req, res) => {
     try {
         const { userId, groupId } = req.body;
-         console.log('hiiiiifdhgggggggggggggggggggggggggggggggggggggggfhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhfgggggggg');
+  
         await UserGroup.create({ userId,isAdmin:false, groupGroupId: groupId });
         await GroupRequest.destroy({
             where: { userId, groupGroupId: groupId }
