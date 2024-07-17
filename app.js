@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyparser = require('body-parser');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const dbconfig = require('./util/dbconfig');
 const User = require('./module/user');
@@ -12,15 +14,17 @@ const GroupRequest = require('./module/groupRequest');
 const singin = require('./router/singin');
 const routgroup = require('./router/routgroup');
 const access = require('./router/access');
-const addmessage = require('./router/addmessage');
 const displaymessage = require('./router/displaymessage');
 const routadmin = require('./router/routadmin');
 const joinrequest = require('./router/joinrequest');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
 const { authenticateToken } = require('./middleware/auth');
 
+// Define associations
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
 
@@ -36,8 +40,6 @@ GroupRequest.belongsTo(User);
 Group.hasMany(GroupRequest);
 GroupRequest.belongsTo(Group);
 
-
-
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 
@@ -45,27 +47,35 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "view")));
 
 app.use('/user', singin);
-
-app.use('/create',routgroup);
-
-app.use('/group',routgroup);
-
-app.use('/group',access);
-
-app.use('/group', addmessage );
-
+app.use('/create', routgroup);
+app.use('/group', routgroup);
+app.use('/group', access);
+app.use('/group', require('./router/addmessage')(io)); // Pass io to addmessage
 app.use('/find', displaymessage);
-          
-app.use('/isAdmin',routadmin);
-
-
-app.use('/add',joinrequest)
+app.use('/isAdmin', routadmin);
+app.use('/add', joinrequest);
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "view", "login.html"));
 });
 
 dbconfig.sync();
-app.listen(3000, () => {
+server.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
+
+// Socket.io connection
+io.on('connection', (socket) => {
+    console.log('A user connected');
+
+    socket.on('joinGroup', (groupId) => {
+        socket.join(groupId);
+        console.log(`User joined group ${groupId}`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
+    });
+});
+
+module.exports = io;
