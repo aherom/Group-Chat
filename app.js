@@ -22,6 +22,7 @@ const routadmin = require('./router/routadmin');
 const joinrequest = require('./router/joinrequest');
 const addmessage = require('./router/addmessage')
 const see = require('./router/see');
+const uploadRouter = require('./router/upload');
 
 const app = express();
 const server = http.createServer(app);
@@ -56,6 +57,8 @@ app.use(bodyparser.json());
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "view")));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
+
 
 app.use('/user', singin);
 app.use('/create', routgroup);
@@ -66,7 +69,7 @@ app.use('/find', displaymessage);
 app.use('/isAdmin', routadmin);
 app.use('/add', joinrequest);
 app.use('/see', see);
-
+app.use('/upload', uploadRouter);
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "view", "login.html"));

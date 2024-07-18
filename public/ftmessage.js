@@ -14,7 +14,11 @@ async function fetchMessages(groupId) {
         messageList.innerHTML = '';  // Clear previous messages
         response.data.forEach(message => {
             const messageItem = document.createElement('li');
-            messageItem.innerHTML = `<strong>${message.userName}:</strong> ${message.content}`;
+            if (message.filePath) {
+                messageItem.innerHTML = `<strong>${message.userName}:</strong> <a href="${message.filePath}" target="_blank">Download File</a>`;
+            } else {
+                messageItem.innerHTML = `<strong>${message.userName}:</strong> ${message.content}`;
+            }
             messageList.appendChild(messageItem);
         });
 
@@ -49,15 +53,51 @@ async function sendMessage() {
     }
 }
 
+async function uploadFile() {
+    try {
+        const fileInput = document.getElementById('fileInput');
+        if (!fileInput.files.length) return;
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        const token = localStorage.getItem('token');
+        const groupId = localStorage.getItem('groupId');  // Ensure you have the group ID
+
+        const response = await axios.post('/upload/uploadFile', formData, {
+            headers: { 'Authorization': token, 'Content-Type': 'multipart/form-data' }
+        });
+
+        const filePath = response.data.filePath;
+
+        await axios.post('/group/addMessage', { content: '', groupId, filePath }, {
+            headers: { 'Authorization': token }
+        });
+
+        fileInput.value = '';  // Clear the input
+
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('Failed to upload file');
+    }
+}
+
 socket.on('message', (message) => {
     const messageList = document.getElementById('messages');
     const messageItem = document.createElement('li');
-    messageItem.innerHTML = `<strong>${message.userName}:</strong> ${message.content}`;
+    if (message.filePath) {
+        messageItem.innerHTML = `<strong>${message.userName}:</strong> <a href="${message.filePath}" target="_blank">Download File</a>`;
+    } else {
+        messageItem.innerHTML = `<strong>${message.userName}:</strong> ${message.content}`;
+    }
     messageList.appendChild(messageItem);
 });
 
 const sendMessageBtn = document.getElementById('sendMessageBtn');
 sendMessageBtn.addEventListener('click', sendMessage);
+
+const uploadFileBtn = document.getElementById('uploadFileBtn');
+uploadFileBtn.addEventListener('click', uploadFile);
 
 async function checkAdminStatus() {
     try {
@@ -71,13 +111,12 @@ async function checkAdminStatus() {
             const userDetailsBtn = document.createElement('button');
             userDetailsBtn.textContent = 'User Details';
             userDetailsBtn.addEventListener('click', () => {
-                members()
+                members();
             });
 
             const manageRequestsBtn = document.createElement('button');
             manageRequestsBtn.textContent = 'Manage Requests';
             manageRequestsBtn.addEventListener('click', () => {
-               
                 manageRequests(groupId);
             });
 
@@ -91,33 +130,35 @@ async function checkAdminStatus() {
 }
 
 checkAdminStatus();
-async function members()
-{
-    const token = localStorage.getItem('token');
+
+async function members() {
+    try {
+        const token = localStorage.getItem('token');
         const response = await axios.get(`/see/members/${groupId}`, {
             headers: { 'Authorization': token }
-        });  
+        });
 
-        
         const requestList = document.createElement('ul');
         requestList.id = 'requestList';
- response.data.forEach(userr=>{
-    const requestItem = document.createElement('li');
-     requestItem.innerHTML = 
-        `<strong>${userr.userName}</strong>`;
-    if(userr.isAdmin!==true){
-        requestItem.innerHTML += 
-        `
-<button onclick="Makeadmin(${userr.userId}, ${groupId})">Makeadmin</button>
-<button onclick="Remove(${userr.userId}, ${groupId})">Remove</button>
-`;
-    }
-        requestList.appendChild(requestItem);
-        })
+        response.data.forEach(userr => {
+            const requestItem = document.createElement('li');
+            requestItem.innerHTML = `<strong>${userr.userName}</strong>`;
+            if (userr.isAdmin !== true) {
+                requestItem.innerHTML += `
+                    <button onclick="Makeadmin(${userr.userId}, ${groupId})">Makeadmin</button>
+                    <button onclick="Remove(${userr.userId}, ${groupId})">Remove</button>
+                `;
+            }
+            requestList.appendChild(requestItem);
+        });
 
-const adminActions = document.getElementById('adminActions');
-adminActions.innerHTML = ''; 
-adminActions.appendChild(requestList);
+        const adminActions = document.getElementById('adminActions');
+        adminActions.innerHTML = ''; 
+        adminActions.appendChild(requestList);
+    } catch (error) {
+        console.error('Error fetching members:', error);
+        alert('Failed to fetch members');
+    }
 }
 
 async function Makeadmin(userId, groupId) {
@@ -127,7 +168,7 @@ async function Makeadmin(userId, groupId) {
             headers: { 'Authorization': token }
         });
         alert('Request accepted');
-        manageRequests(groupId); // Refresh the list
+        members(); // Refresh the list
     } catch (error) {
         console.error('Error accepting request:', error);
         alert('Failed to accept request');
@@ -141,14 +182,12 @@ async function Remove(userId, groupId) {
             headers: { 'Authorization': token }
         });
         alert('Request accepted');
-        manageRequests(groupId); // Refresh the list
+        members(); // Refresh the list
     } catch (error) {
         console.error('Error accepting request:', error);
         alert('Failed to accept request');
     }
 }
-
-
 
 async function manageRequests(groupId) {
     try {

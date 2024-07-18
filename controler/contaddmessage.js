@@ -5,7 +5,7 @@ module.exports = (io) => {
     return {
         addMessage: async (req, res) => {
             try {
-                const { content, groupId } = req.body;
+                const { content, groupId, filePath } = req.body;
                 const { userid } = req.user;
 
                 const user = await User.findOne({ where: { id: userid } });
@@ -19,13 +19,15 @@ module.exports = (io) => {
                     content: content,
                     userId: userid,
                     groupGroupId: groupId,
-                    userName: userName
+                    userName: userName,
+                    filePath: filePath // Save the file path if available
                 });
 
-                // Emit the new message to the group
+                
                 io.to(groupId).emit('message', {
                     userName: userName,
-                    content: content
+                    content: content,
+                    filePath: filePath
                 });
 
                 res.status(201).send('Message added successfully');

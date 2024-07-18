@@ -13,6 +13,10 @@ const Message = sequelize.define('message', {
         type: Sequelize.TEXT,
         allowNull: false
     },
+    filePath: {
+        type: Sequelize.STRING,
+        allowNull: true 
+    },
     userId: {
         type: Sequelize.INTEGER,
         references: {
@@ -20,7 +24,7 @@ const Message = sequelize.define('message', {
             key: 'id'
         }
     },
-    userName: {  // Add this line
+    userName: {  
         type: Sequelize.STRING,
         allowNull: false
     }
