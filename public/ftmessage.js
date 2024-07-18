@@ -98,17 +98,20 @@ async function members()
             headers: { 'Authorization': token }
         });  
 
-        console.log(response.data);
         
         const requestList = document.createElement('ul');
         requestList.id = 'requestList';
  response.data.forEach(userr=>{
     const requestItem = document.createElement('li');
-        requestItem.innerHTML = 
-        `<strong>${userr.userName}</strong>
+     requestItem.innerHTML = 
+        `<strong>${userr.userName}</strong>`;
+    if(userr.isAdmin!==true){
+        requestItem.innerHTML += 
+        `
 <button onclick="Makeadmin(${userr.userId}, ${groupId})">Makeadmin</button>
 <button onclick="Remove(${userr.userId}, ${groupId})">Remove</button>
 `;
+    }
         requestList.appendChild(requestItem);
         })
 

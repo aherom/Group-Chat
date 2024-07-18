@@ -18,6 +18,7 @@ const displaymessage = require('./router/displaymessage');
 const routadmin = require('./router/routadmin');
 const joinrequest = require('./router/joinrequest');
 const addmessage = require('./router/addmessage')
+const see = require('./router/see');
 
 const app = express();
 const server = http.createServer(app);
@@ -57,42 +58,11 @@ app.use('/user', singin);
 app.use('/create', routgroup);
 app.use('/group', routgroup);
 app.use('/group', access);
-app.use('/group', addmessage(io)); // Pass io to addmessage
+app.use('/group', addmessage(io)); 
 app.use('/find', displaymessage);
 app.use('/isAdmin', routadmin);
 app.use('/add', joinrequest);
-
-app.use('/see/members/:groupId', async (req, res) => {
-    const { groupId } = req.params;
-
-    try {
-        const userGroups = await UserGroup.findAll({
-            where: { groupGroupId: groupId },
-            include: [
-                {
-                    model: User,
-                    attributes: ['name']
-                }
-            ],
-            order: [['createdAt', 'ASC']]
-        });
-
-        const members = userGroups.map(userGroup => {
-            return {
-                userGroupId: userGroup.userGroupId,
-                userId: userGroup.userId,
-                isAdmin: userGroup.isAdmin,
-                groupGroupId: userGroup.groupGroupId,
-                userName: userGroup.user.name 
-            };
-        });
-         console.log(members);
-        res.json(members);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server error');
-    }
-});
+app.use('/see', see);
 
 
 app.get('/', (req, res) => {
